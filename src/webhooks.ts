@@ -147,7 +147,9 @@ export function createHonoHandler(pubkey: string | KeyObject, options?: HonoOpti
       throw new HTTPException(400, { message: 'Incompatible compatibility date' });
     }
 
-    emit(parseEvent(result.payloadJson));
+    const event = parseEvent(result.payloadJson);
+    ;(event as any).$hono = c;
+    emit(event);
 
     return c.newResponse(null, 204);
   })

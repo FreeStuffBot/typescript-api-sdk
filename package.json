@@ -1,6 +1,6 @@
 {
   "name": "freestuff",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "An API wrapper for the FreeStuff API",
   "homepage": "https://docs.freestuffbot.xyz/libraries/node",
   "main": "dist/index.js",
