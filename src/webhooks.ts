@@ -6,8 +6,6 @@ import express, { raw } from 'express';
 import { newSignedMessageVerifier, type VerifierOptions } from './verifier';
 import { emit } from './events';
 import { parseEvent } from './parser';
-import { createFactory } from 'hono/factory';
-import { HTTPException } from 'hono/http-exception';
 
 
 type ExpressOptions = Partial<Omit<VerifierOptions, 'publicKey'> & { debug?: boolean; }>
@@ -67,7 +65,7 @@ export function createExpressHandler(pubkey: string | KeyObject, options?: Expre
 
       res.status(204).end();
 
-      if (!result.payloadJson.type || !String(result.payloadJson.type).startsWith('fsb:event:')) {
+      if (!result.payloadJson?.type || !String(result.payloadJson.type).startsWith('fsb:event:')) {
         console.warn(`Received a correctly signed but unsupported payload.`);
         console.log(result.payloadJson);
         return;
@@ -96,7 +94,10 @@ export function createExpressServer(options: VerifierOptions & { port?: number, 
 
 type HonoOptions = Partial<Omit<VerifierOptions, 'publicKey'> & { debug?: boolean; }>
 
-export function createHonoHandler(pubkey: string | KeyObject, options?: HonoOptions) {
+export async function createHonoHandler(pubkey: string | KeyObject, options?: HonoOptions) {
+  const { createFactory } = await import('hono/factory');
+  const { HTTPException } = await import('hono/http-exception');
+
   const factory = createFactory();
   const verifier = newSignedMessageVerifier({
     publicKey: pubkey,
@@ -145,6 +146,10 @@ export function createHonoHandler(pubkey: string | KeyObject, options?: HonoOpti
     const compatibilityDate = c.req.header('x-compatibility-date');
     if (compatibilityDate !== getCompatibility()) {
       throw new HTTPException(400, { message: 'Incompatible compatibility date' });
+    }
+
+    if (!result.payloadJson) {
+      throw new HTTPException(400, { message: 'Missing payload JSON' });
     }
 
     const event = parseEvent(result.payloadJson);
