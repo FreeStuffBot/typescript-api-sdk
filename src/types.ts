@@ -69,12 +69,6 @@ export type ProductUrlFlags = Bitfield<
   | 'OPENS_IN_CLIENT'
 >;
 
-export type ProductUrl = {
-  url: string,
-  flags: ProductUrlFlags,
-  priority: number,
-};
-
 export type Store
   = 'other'
   | 'steam'
@@ -122,9 +116,22 @@ export type ProductMetaKey
   | 'prime.fgwp'
   | 'prime.priority';
 
+export type ProductUrl = {
+  url: string,
+  flags: ProductUrlFlags,
+  priority: number,
+  store: Store,
+  platforms: Platform[],
+};
+
 export type ProductMeta = {
   key: ProductMetaKey,
   value: string,
+};
+
+export type LocalizedProductDescription = {
+  lang: string,
+  text: string,
 };
 
 export type Product = {
@@ -134,7 +141,7 @@ export type Product = {
   kind: ProductKind,
   tags: string[],
   images: ProductImage[],
-  description: string,
+  description: LocalizedProductDescription[],
   rating: number,
   copyright: string,
   until: Date | null,
