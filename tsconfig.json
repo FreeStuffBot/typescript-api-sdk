@@ -25,6 +25,8 @@
   },
   "include": [
     "./src/index.ts",
-    "./src/parser.ts"
+    "./src/parser.ts",
+    "./src/plugins/*.ts",
+    "./src/plugins/**/*.ts",
   ]
 }
