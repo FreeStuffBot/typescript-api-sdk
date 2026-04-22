@@ -31,7 +31,7 @@ const productImageFlags = {
   FT_TAGS: 1<<9,
 };
 
-function parseProduct(product: Record<string, unknown>): Product {
+export function parseProduct(product: Record<string, unknown>): Product {
   product.until = product.until
     ? new Date(product.until as string)
     : null;
@@ -41,7 +41,7 @@ function parseProduct(product: Record<string, unknown>): Product {
   return product as Product;
 }
 
-function parseResolvedAnnouncement(announcement: Record<string, unknown>): ResolvedAnnouncement {
+export function parseResolvedAnnouncement(announcement: Record<string, unknown>): ResolvedAnnouncement {
   announcement.resolvedProducts = (announcement.resolvedProducts as Array<Record<string, unknown>>).map(parseProduct);
   return announcement as ResolvedAnnouncement;
 }

@@ -24,6 +24,7 @@
     "emitDecoratorMetadata": true
   },
   "include": [
-    "./src/index.ts"
+    "./src/index.ts",
+    "./src/parser.ts"
   ]
 }
