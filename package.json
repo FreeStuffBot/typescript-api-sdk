@@ -1,6 +1,6 @@
 {
   "name": "freestuff",
-  "version": "2.3.0-rc.3",
+  "version": "2.3.0-rc.4",
   "description": "An API wrapper for the FreeStuff API",
   "homepage": "https://docs.freestuffbot.xyz/libraries/node",
   "main": "dist/index.js",
@@ -25,10 +25,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:bun": "bun build ./src/index.ts ./src/parser.ts ./src/plugins/hono.ts ./src/plugins/express.ts --root ./src --outdir ./dist --packages=external --target=node --sourcemap=linked",
-    "build:tsc": "tsc --declaration --emitDeclarationOnly --outDir dist",
-    "build": "bun run build:bun && bun run build:tsc",
-    "prepublish": "bun run build"
+    "build": "tsc -p tsconfig.json",
+    "prepublish": "npm run build"
   },
   "author": {
     "name": "Andreas May",
