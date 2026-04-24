@@ -6,16 +6,23 @@ import type { KeyObject } from 'node:crypto';
 import { newSignedMessageVerifier, type VerifierOptions } from '../verifier';
 import { emit } from '../events';
 import { parseEvent } from '../parser';
+import { Context } from 'hono/dist/types/context'
+import { Env } from 'hono/types'
 
 
 type HonoOptions = Partial<Omit<VerifierOptions, 'publicKey'> & { debug?: boolean; }>
 
-export function createHonoHandler(pubkey: string | KeyObject, options?: HonoOptions) {
-  const factory = createFactory();
-  const verifier = newSignedMessageVerifier({
-    publicKey: pubkey,
-    ...(options ?? {}),
-  });
+type PubkeyFactory<HonoE extends Env = Env> = (c: Context<HonoE, string, {}>) => Promise<string | KeyObject>;
+type PubkeyOrFactory<HonoE extends Env = Env> = string | KeyObject | PubkeyFactory<HonoE>;
+
+export function createHonoHandler<HonoE extends Env = Env>(pubkey: PubkeyOrFactory<HonoE>, options?: HonoOptions) {
+  const factory = createFactory<HonoE>();
+  const verifier = typeof pubkey === 'function'
+    ? null
+    : newSignedMessageVerifier({
+        publicKey: pubkey,
+        ...(options ?? {}),
+      });
 
   return factory.createHandlers(async (c) => {
     c.header('X-Set-Compatibility-Date', getCompatibility());
@@ -35,7 +42,12 @@ export function createHonoHandler(pubkey: string | KeyObject, options?: HonoOpti
       throw new HTTPException(500, { message: 'Invalid server configuration' });
     }
 
-    const result = verifier({
+    const localVerifier = verifier ?? newSignedMessageVerifier({
+      publicKey: await (pubkey as PubkeyFactory<HonoE>)(c),
+      ...(options ?? {}),
+    });
+
+    const result = localVerifier({
       data: body,
       signature: String(c.req.header('webhook-signature')),
       messageId: String(c.req.header('webhook-id')),
