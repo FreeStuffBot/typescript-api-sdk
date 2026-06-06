@@ -21,6 +21,7 @@ export type Channel
   | 'mobile'
   | 'news'
   | 'unknown'
+  | 'assets'
   | 'debug';
 
 export type ProductPrice = {
